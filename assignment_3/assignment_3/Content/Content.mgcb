@@ -403,12 +403,6 @@
 /processorParam:TextureFormat=Color
 /build:wicker-small.png
 
-#begin ReflectionShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:ReflectionShader.fx
-
 #begin BumpEnvironmentMapShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor

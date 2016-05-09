@@ -69,6 +69,8 @@ namespace assignment_3
             //Load environment mapping shader
             Effect envMapShader = Content.Load<Effect>("BumpEnvironmentMapShader");
             BumpEnvironmentMappedComponent envMapComp = new BumpEnvironmentMappedComponent { Effect = envMapShader };
+            envMapComp.NormalMap = Content.Load<Texture2D>("flat-normal-map");
+            hangar1.AddComponent(envMapComp);
 
             ModelComponent snowplow1Comp = new ModelComponent { Model = snowplowModel };
             TransformComponent snowplow1Trans = new TransformComponent { Scale = new Vector3(0.01f), Position = new Vector3(600, 152, -415), QuaternionRotation = Quaternion.Identity };

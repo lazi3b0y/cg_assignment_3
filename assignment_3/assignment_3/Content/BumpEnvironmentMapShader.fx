@@ -48,10 +48,8 @@ samplerCUBE ReflectiveSampler = sampler_state {
 
 struct VertexShaderInput
 {
-    float4 Position : POSITION0;
+    float4 Position : SV_Position0;
     float3 Normal : NORMAL0;
-    float3 Tangent : TANGENT0;
-    float3 Binormal : BINORMAL0;
     float2 TextureCoordinate : TEXCOORD0;
 };
 
@@ -68,6 +66,24 @@ struct VertexShaderOutput
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
     VertexShaderOutput output;
+	
+	float3 tangent;
+	float3 binormal;
+	float3 c1 = cross(input.Normal, float3(0.0, 0.0, 1.0));
+	float3 c2 = cross(input.Normal, float3(0.0, 1.0, 0.0));
+	
+	if(length(c1) > length(c2))
+	{
+		tangent = c1;
+	}
+	else
+	{
+		tangent = c2;
+	}
+	
+	tangent = normalize(tangent);
+	binormal = cross(input.Normal,tangent);
+	binormal = normalize(binormal);
 
     float4 worldPosition = mul(input.Position, World);
     float4 viewPosition = mul(worldPosition, View);
@@ -79,8 +95,8 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     
 	output.Reflection = reflect(-normalize(ViewDirection), normalize(Normal));	
     output.Normal = normalize(mul(input.Normal, WorldInverseTranspose));
-    output.Tangent = normalize(mul(input.Tangent, WorldInverseTranspose));
-    output.Binormal = normalize(mul(input.Binormal, WorldInverseTranspose));
+    output.Tangent = normalize(mul(tangent, WorldInverseTranspose));
+    output.Binormal = normalize(mul(binormal, WorldInverseTranspose));
 
     output.TextureCoordinate = input.TextureCoordinate;
     return output;
@@ -88,8 +104,26 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
+	float3 tangent;
+	float3 binormal;
+	float3 c1 = cross(input.Normal, float3(0.0, 0.0, 1.0));
+	float3 c2 = cross(input.Normal, float3(0.0, 1.0, 0.0));
+	
+	if(length(c1) > length(c2))
+	{
+		tangent = c1;
+	}
+	else
+	{
+		tangent = c2;
+	}
+	
+	tangent = normalize(tangent);
+	binormal = cross(input.Normal,tangent);
+	binormal = normalize(binormal);
+	
     float3 bump = BumpConstant * (tex2D(bumpSampler, input.TextureCoordinate) - (0.5, 0.5, 0.5));
-    float3 bumpNormal = input.Normal + (bump.x * input.Tangent + bump.y * input.Binormal);
+    float3 bumpNormal = input.Normal + (bump.x * tangent + bump.y * binormal);
     bumpNormal = normalize(bumpNormal);
 
     float diffuseIntensity = dot(normalize(DiffuseLightDirection), bumpNormal);

@@ -46,8 +46,14 @@ namespace assignment_3.Systems
                             envMap.Effect.Parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
                             envMap.Effect.Parameters["View"].SetValue(camera.ViewMatrix);
                             envMap.Effect.Parameters["Projection"].SetValue(camera.ProjectionMatrix);
-                            //envMap.Effect.Parameters["ReflectiveModelTexture"].SetValue();
-                            envMap.Effect.Parameters["CameraPosition"].SetValue(camera.CameraPosition);
+
+                            TextureCube tC = new TextureCube(_graphics, 256, true, SurfaceFormat.Color);
+                            envMap.Effect.Parameters["ReflectiveModelTexture"].SetValue(tC);
+
+                            //normal texture in normal-tangent-binormal-frame ??
+                            envMap.Effect.Parameters["NormalMap"].SetValue(envMap.NormalMap);
+
+                            envMap.Effect.Parameters["CameraPos"].SetValue(camera.CameraPosition);
                             envMap.Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
                         }
                     }

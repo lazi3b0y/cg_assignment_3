@@ -10,5 +10,7 @@ namespace assignment_3.Components
     public class BumpEnvironmentMappedComponent : Component
     {
         public Effect Effect { get; set; }
+
+        public Texture2D NormalMap { get; set; }
     }
 }
