@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,7 +33,6 @@ namespace assignment_3.Systems
 
                 Matrix[] transforms = new Matrix[model.Model.Bones.Count];
                 model.Model.CopyAbsoluteBoneTransformsTo(transforms);
-
 
                 foreach (ModelMesh mesh in model.Model.Meshes)
                 {
