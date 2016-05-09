@@ -1,4 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using assignment_3.Components;
+using assignment_3.Entites;
+using assignment_3.Handlers;
+using assignment_3.Systems;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -9,12 +13,14 @@ namespace assignment_3
     /// </summary>
     public class Game1 : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        private GraphicsDeviceManager _graphics;
+        private CameraHandler _cameraHandler = CameraHandler.Instance;
+        private SystemHandler _systemHandler = SystemHandler.Instance;
+        private ComponentHandler _componentHandler = ComponentHandler.Instance;
 
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
@@ -37,10 +43,31 @@ namespace assignment_3
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            _systemHandler.AddSystem(new ObserverSystem());
+            _systemHandler.AddSystem(new CameraSystem());
+            _systemHandler.AddSystem(new TransformSystem());
+            _systemHandler.AddSystem(new ModelRenderSystem(_graphics.GraphicsDevice));
 
-            // TODO: use this.Content to load your game content here
+            CameraComponent camera = new CameraComponent { CameraNearPlaneDistance = 0.1f, CameraFarPlaneDistance = 500f, CameraAspectRatio = _graphics.GraphicsDevice.Viewport.AspectRatio };
+            TransformComponent observerTransform = new TransformComponent { Scale = new Vector3(0.001f), Position = new Vector3(600, 150, -450), QuaternionRotation = Quaternion.Identity };
+            ObserverComponent observerComponent = new ObserverComponent();
+
+            Entity observer = new Entity();
+
+            Model hangarModel = Content.Load<Model>("moffett-hangar2");
+
+            Entity hangar1 = new Entity();
+            ModelComponent hangar1Comp = new ModelComponent { Model = hangarModel };
+            TransformComponent hangar1Trans = new TransformComponent { Scale = new Vector3(0.001f), Position = new Vector3(600, 150, -425), QuaternionRotation = Quaternion.Identity };
+            hangar1.AddComponent(hangar1Comp);
+            hangar1.AddComponent(hangar1Trans);
+
+            _cameraHandler.ActiveCamera = camera;
+
+            observer.AddComponent(camera);
+            observer.AddComponent(observerTransform);
+            observer.AddComponent(observerComponent);
+
         }
 
         /// <summary>
@@ -62,8 +89,7 @@ namespace assignment_3
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
-
+            _systemHandler.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -75,8 +101,7 @@ namespace assignment_3
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
-
+            _systemHandler.Render(gameTime);
             base.Draw(gameTime);
         }
     }
