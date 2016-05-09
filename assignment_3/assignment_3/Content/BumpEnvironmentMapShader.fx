@@ -12,7 +12,7 @@ float DiffuseIntensity = 1.0;
 
 float Shininess = 200;
 float4 SpecularColor = float4(1, 1, 1, 1);    
-float SpecularIntensity = 1;
+float SpecularIntensity = 1.0;
 float3 ViewVector = float3(1, 0, 0);
 float3 CameraPos;
 
@@ -35,8 +35,9 @@ sampler2D bumpSampler = sampler_state {
     AddressV = Wrap;
 };
 
+float EnvironmentMapIntensity;
 texture ReflectiveModelTexture;
-sampler2D reflectiveSampler = sampler_state {
+samplerCUBE ReflectiveSampler = sampler_state {
 	texture = (ReflectiveModelTexture); 
 	Magfilter = Linear; 
 	Minfilter = Linear; 
@@ -105,7 +106,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
     textureColor.a = 1;
 
-    return saturate(textureColor * (diffuseIntensity) + AmbientColor * AmbientIntensity + specular);
+    return (saturate(textureColor * (diffuseIntensity) + AmbientColor * AmbientIntensity + specular)) * texCUBE(ReflectiveSampler, normalize(input.Reflection));
 }
 
 technique BumpRefMapped

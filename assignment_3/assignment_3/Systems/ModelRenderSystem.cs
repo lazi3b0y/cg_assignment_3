@@ -36,12 +36,30 @@ namespace assignment_3.Systems
 
                 foreach (ModelMesh mesh in model.Model.Meshes)
                 {
-                    foreach (BasicEffect effect in mesh.Effects)
+                    BumpEnvironmentMappedComponent envMap = ComponentHandler.GetComponent<BumpEnvironmentMappedComponent>(model.Owner);
+
+                    if (envMap != null)
                     {
-                        effect.EnableDefaultLighting();
-                        effect.World = transforms[mesh.ParentBone.Index] * transform.WorldMatrix;
-                        effect.View = camera.ViewMatrix;
-                        effect.Projection = camera.ProjectionMatrix;
+                        foreach(ModelMeshPart part in mesh.MeshParts)
+                        {
+                            part.Effect = envMap.Effect;
+                            envMap.Effect.Parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
+                            envMap.Effect.Parameters["View"].SetValue(camera.ViewMatrix);
+                            envMap.Effect.Parameters["Projection"].SetValue(camera.ProjectionMatrix);
+                            //envMap.Effect.Parameters["ReflectiveModelTexture"].SetValue();
+                            envMap.Effect.Parameters["CameraPosition"].SetValue(camera.CameraPosition);
+                            envMap.Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
+                        }
+                    }
+                    else
+                    {
+                        foreach (BasicEffect effect in mesh.Effects)
+                        {
+                            effect.EnableDefaultLighting();
+                            effect.World = transforms[mesh.ParentBone.Index] * transform.WorldMatrix;
+                            effect.View = camera.ViewMatrix;
+                            effect.Projection = camera.ProjectionMatrix;
+                        }
                     }
                     mesh.Draw();
                 }

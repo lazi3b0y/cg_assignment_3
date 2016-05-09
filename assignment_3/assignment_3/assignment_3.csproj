@@ -41,6 +41,7 @@
     <Compile Include="Components\CameraComponent.cs" />
     <Compile Include="Components\ChaseCameraComponent.cs" />
     <Compile Include="Components\Component.cs" />
+    <Compile Include="Components\BumpEnvironmentMappedComponent.cs" />
     <Compile Include="Components\ModelComponent.cs" />
     <Compile Include="Components\ObserverComponent.cs" />
     <Compile Include="Components\TransformComponent.cs" />

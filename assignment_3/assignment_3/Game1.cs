@@ -60,13 +60,15 @@ namespace assignment_3
             Entity hangar2 = new Entity();
             Entity hangar3 = new Entity();
             Entity snowplow1 = new Entity();
+            Entity water = new Entity();
 
             //Load 3d texturized model files
             Model hangarModel = Content.Load<Model>("moffett-hangar2");
             Model snowplowModel = Content.Load<Model>("snowplow");
 
-            //Load shader
-            //Effect shader = Content.Load<Effect>("shader");
+            //Load environment mapping shader
+            Effect envMapShader = Content.Load<Effect>("BumpEnvironmentMapShader");
+            BumpEnvironmentMappedComponent envMapComp = new BumpEnvironmentMappedComponent { Effect = envMapShader };
 
             ModelComponent snowplow1Comp = new ModelComponent { Model = snowplowModel };
             TransformComponent snowplow1Trans = new TransformComponent { Scale = new Vector3(0.01f), Position = new Vector3(600, 152, -415), QuaternionRotation = Quaternion.Identity };
