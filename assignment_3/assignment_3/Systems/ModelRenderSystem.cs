@@ -35,6 +35,9 @@ namespace assignment_3.Systems
                 model.Model.CopyAbsoluteBoneTransformsTo(transforms);
 
                 BumpEnvironmentMappedComponent envMap = ComponentHandler.GetComponent<BumpEnvironmentMappedComponent>(model.Owner);
+                BumpMapComponent bumpMap = ComponentHandler.GetComponent<BumpMapComponent>(model.Owner);
+                EnvironmentMappingComponent envirMap = ComponentHandler.GetComponent<EnvironmentMappingComponent>(model.Owner);
+                DiffuseLightingComponent diffuseLight = ComponentHandler.GetComponent<DiffuseLightingComponent>(model.Owner);
 
                 if (envMap != null)
                 {
@@ -42,7 +45,6 @@ namespace assignment_3.Systems
                     {
                         foreach (ModelMeshPart part in mesh.MeshParts)
                         {
-                            part.Effect = envMap.Effect;
                             envMap.Effect.Parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
                             envMap.Effect.Parameters["View"].SetValue(camera.ViewMatrix);
                             envMap.Effect.Parameters["Projection"].SetValue(camera.ProjectionMatrix);
@@ -50,9 +52,66 @@ namespace assignment_3.Systems
                             envMap.Effect.Parameters["NormalMap"].SetValue(envMap.NormalMap);
                             envMap.Effect.Parameters["CameraPos"].SetValue(camera.CameraPosition);
                             envMap.Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
+
+                            if (((BasicEffect)part.Effect).Texture != null)
+                            {
+                                envMap.Effect.Parameters["ModelTexture"].SetValue(((BasicEffect)part.Effect).Texture);
+                            }
                         }
-                        mesh.Draw();
+                        model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
                     }
+                }
+                else if (bumpMap != null)
+                {
+                    foreach (ModelMesh mesh in model.Model.Meshes)
+                    {
+                        foreach (ModelMeshPart part in mesh.MeshParts)
+                        {
+                            var parameters = bumpMap.Effect.Parameters;
+                            parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
+                            parameters["View"].SetValue(camera.ViewMatrix);
+                            parameters["Projection"].SetValue(camera.ProjectionMatrix);
+                            parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
+
+                            parameters["NormalMap"].SetValue(bumpMap.NormalMap);
+                            if (((BasicEffect)part.Effect).Texture != null)
+                            {
+                                parameters["ModelTexture"].SetValue(((BasicEffect)part.Effect).Texture);
+                            }  
+                        }
+                    }
+                }
+                else if (envirMap != null)
+                {
+                    foreach (ModelMesh mesh in model.Model.Meshes)
+                    {
+                        foreach (ModelMeshPart part in mesh.MeshParts)
+                        {
+                            var parameters = envirMap.Effect.Parameters;
+                            parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
+                            parameters["View"].SetValue(camera.ViewMatrix);
+                            parameters["Projection"].SetValue(camera.ProjectionMatrix);
+                            parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
+
+                            parameters["CameraPosition"].SetValue(camera.CameraPosition);
+                            parameters["ReflectionTexture"].SetValue(_cubeMap);
+                        }
+                    }
+                    model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
+                }
+                else if (diffuseLight != null)
+                {
+                    foreach (ModelMesh mesh in model.Model.Meshes)
+                    {
+                        foreach (ModelMeshPart part in mesh.MeshParts)
+                        {
+                            diffuseLight.Effect.Parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
+                            diffuseLight.Effect.Parameters["View"].SetValue(camera.ViewMatrix);
+                            diffuseLight.Effect.Parameters["Projection"].SetValue(camera.ProjectionMatrix);
+                            diffuseLight.Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
+                        }
+                    }
+                    model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
                 }
                 else
                 {

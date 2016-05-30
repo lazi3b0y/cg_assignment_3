@@ -5,7 +5,6 @@ using assignment_3.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 
 namespace assignment_3
 {
@@ -74,29 +73,58 @@ namespace assignment_3
             Model hangarModel = Content.Load<Model>("moffett-hangar2");
             Model snowplowModel = Content.Load<Model>("snowplow");
 
+            //Load BumpEnvironment mapping shader
+            Effect envBumpMapShader = Content.Load<Effect>("BumpEnvironmentMapShader - Copy");
+            BumpEnvironmentMappedComponent envBumpMapComp = new BumpEnvironmentMappedComponent
+            {
+                Effect = envBumpMapShader,
+                NormalMap = Content.Load<Texture2D>("flat-normal-map")
+            };
+
+            //Load bump mapping shader
+            Effect bumpMapShader = Content.Load<Effect>("bump-mapping");
+            BumpMapComponent bumpMapComp = new BumpMapComponent
+            {
+                Effect = bumpMapShader,
+                NormalMap = Content.Load<Texture2D>("setts-normalmap")
+            };
+
             //Load environment mapping shader
-            Effect envMapShader = Content.Load<Effect>("BumpEnvironmentMapShader - Copy");
-            BumpEnvironmentMappedComponent envMapComp = new BumpEnvironmentMappedComponent { Effect = envMapShader };
-            envMapComp.NormalMap = Content.Load<Texture2D>("flat-normal-map");
-            hangar1.AddComponent(envMapComp);
+            Effect envMapShader = Content.Load<Effect>("environment-mapping");
+            EnvironmentMappingComponent envMapComp = new EnvironmentMappingComponent
+            {
+                Effect = envMapShader
+            };
+
+            //Load diffuse lighting shader
+            Effect diffuseLightingShader = Content.Load<Effect>("diffuse-lighting");
+            DiffuseLightingComponent diffuseLightingComp = new DiffuseLightingComponent
+            {
+                Effect = diffuseLightingShader
+            };
+
+            hangar1.AddComponent(envBumpMapComp);
+            hangar2.AddComponent(envBumpMapComp);
+            hangar3.AddComponent(envBumpMapComp);
+            snowplow1.AddComponent(envBumpMapComp);
 
             ModelComponent snowplow1Comp = new ModelComponent { Model = snowplowModel };
-            TransformComponent snowplow1Trans = new TransformComponent { Scale = new Vector3(0.1f), Position = new Vector3(600, 152, -415), QuaternionRotation = Quaternion.Identity };
+            TransformComponent snowplow1Trans = new TransformComponent { Scale = new Vector3(0.1f), Position = new Vector3(600, 150, -300), QuaternionRotation = Quaternion.Identity };
             snowplow1.AddComponent(snowplow1Comp);
             snowplow1.AddComponent(snowplow1Trans);
 
             ModelComponent hangar1Comp = new ModelComponent { Model = hangarModel };
-            TransformComponent hangar1Trans = new TransformComponent { Scale = new Vector3(0.1f), Position = new Vector3(600, 150, -425), QuaternionRotation = Quaternion.Identity };
+            TransformComponent hangar1Trans = new TransformComponent { Scale = new Vector3(0.01f), Position = new Vector3(600, 150, -500), QuaternionRotation = Quaternion.Identity };
             hangar1.AddComponent(hangar1Comp);
             hangar1.AddComponent(hangar1Trans);
 
             ModelComponent hangar2Comp = new ModelComponent { Model = hangarModel };
-            TransformComponent hangar2Trans = new TransformComponent { Scale = new Vector3(0.1f), Position = new Vector3(600, 150, -450), QuaternionRotation = Quaternion.Identity };
+            TransformComponent hangar2Trans = new TransformComponent { Scale = new Vector3(0.01f), Position = new Vector3(600, 150, -700), QuaternionRotation = Quaternion.Identity };
             hangar2.AddComponent(hangar2Comp);
             hangar2.AddComponent(hangar2Trans);
 
             ModelComponent hangar3Comp = new ModelComponent { Model = hangarModel };
-            TransformComponent hangar3Trans = new TransformComponent { Scale = new Vector3(0.1f), Position = new Vector3(600, 150, -475), QuaternionRotation = Quaternion.Identity };
+            TransformComponent hangar3Trans = new TransformComponent { Scale = new Vector3(0.01f), Position = new Vector3(600, 150, -900), QuaternionRotation = Quaternion.Identity };
             hangar3.AddComponent(hangar3Comp);
             hangar3.AddComponent(hangar3Trans);
         }

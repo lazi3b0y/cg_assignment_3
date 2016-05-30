@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace assignment_3.Components
 {
-    public class ModelComponent : Component
+    class BumpMapComponent : Component
     {
-        public Model Model { get; set; }
-        public Texture2D Texture { get; }
+        public Effect Effect { get; set; }
+        public Texture2D NormalMap { get; set; }
     }
 }

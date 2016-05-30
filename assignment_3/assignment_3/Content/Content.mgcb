@@ -415,3 +415,21 @@
 /processorParam:DebugMode=Auto
 /build:BumpEnvironmentMapShader - Copy.fx
 
+#begin bump-mapping.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:bump-mapping.fx
+
+#begin diffuse-lighting.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:diffuse-lighting.fx
+
+#begin environment-mapping.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:environment-mapping.fx
+
