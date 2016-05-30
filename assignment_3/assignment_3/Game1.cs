@@ -44,11 +44,12 @@ namespace assignment_3
         /// </summary>
         protected override void LoadContent()
         {
+            var cubeMap = new TextureCube(_graphics.GraphicsDevice, 32, true, SurfaceFormat.Color);
             _systemHandler.AddSystem(new ObserverSystem());
             _systemHandler.AddSystem(new ChaseCameraSystem());
             _systemHandler.AddSystem(new CameraSystem());
             _systemHandler.AddSystem(new TransformSystem());
-            _systemHandler.AddSystem(new ModelRenderSystem(_graphics.GraphicsDevice));
+            _systemHandler.AddSystem(new ModelRenderSystem(cubeMap));
 
             CameraComponent camera = new CameraComponent { CameraNearPlaneDistance = 0.1f, CameraFarPlaneDistance = 500f, CameraAspectRatio = _graphics.GraphicsDevice.Viewport.AspectRatio };
             ChaseCameraComponent chaseCamera = new ChaseCameraComponent { CameraOffset = new Vector3(0, 0.1f, 1) };
@@ -62,43 +63,42 @@ namespace assignment_3
             Entity snowplow1 = new Entity();
             Entity water = new Entity();
 
-            //Load 3d texturized model files
-            Model hangarModel = Content.Load<Model>("moffett-hangar2");
-            Model snowplowModel = Content.Load<Model>("snowplow");
-
-            //Load environment mapping shader
-            Effect envMapShader = Content.Load<Effect>("BumpEnvironmentMapShader");
-            BumpEnvironmentMappedComponent envMapComp = new BumpEnvironmentMappedComponent { Effect = envMapShader };
-            envMapComp.NormalMap = Content.Load<Texture2D>("flat-normal-map");
-            hangar1.AddComponent(envMapComp);
-
-            ModelComponent snowplow1Comp = new ModelComponent { Model = snowplowModel };
-            TransformComponent snowplow1Trans = new TransformComponent { Scale = new Vector3(0.01f), Position = new Vector3(600, 152, -415), QuaternionRotation = Quaternion.Identity };
-            snowplow1.AddComponent(snowplow1Comp);
-            snowplow1.AddComponent(snowplow1Trans);
-
-
-            ModelComponent hangar1Comp = new ModelComponent { Model = hangarModel };
-            TransformComponent hangar1Trans = new TransformComponent { Scale = new Vector3(0.001f), Position = new Vector3(600, 150, -425), QuaternionRotation = Quaternion.Identity };
-            hangar1.AddComponent(hangar1Comp);
-            hangar1.AddComponent(hangar1Trans);
-
-            ModelComponent hangar2Comp = new ModelComponent { Model = hangarModel };
-            TransformComponent hangar2Trans = new TransformComponent { Scale = new Vector3(0.001f), Position = new Vector3(600, 150, -450), QuaternionRotation = Quaternion.Identity };
-            hangar2.AddComponent(hangar2Comp);
-            hangar2.AddComponent(hangar2Trans);
-
-            ModelComponent hangar3Comp = new ModelComponent { Model = hangarModel };
-            TransformComponent hangar3Trans = new TransformComponent { Scale = new Vector3(0.001f), Position = new Vector3(600, 150, -475), QuaternionRotation = Quaternion.Identity };
-            hangar3.AddComponent(hangar3Comp);
-            hangar3.AddComponent(hangar3Trans);
-
             _cameraHandler.ActiveCamera = camera;
 
             observer.AddComponent(camera);
             observer.AddComponent(chaseCamera);
             observer.AddComponent(observerTransform);
             observer.AddComponent(observerComponent);
+
+            //Load 3d texturized model files
+            Model hangarModel = Content.Load<Model>("moffett-hangar2");
+            Model snowplowModel = Content.Load<Model>("snowplow");
+
+            //Load environment mapping shader
+            Effect envMapShader = Content.Load<Effect>("BumpEnvironmentMapShader - Copy");
+            BumpEnvironmentMappedComponent envMapComp = new BumpEnvironmentMappedComponent { Effect = envMapShader };
+            envMapComp.NormalMap = Content.Load<Texture2D>("flat-normal-map");
+            hangar1.AddComponent(envMapComp);
+
+            ModelComponent snowplow1Comp = new ModelComponent { Model = snowplowModel };
+            TransformComponent snowplow1Trans = new TransformComponent { Scale = new Vector3(0.1f), Position = new Vector3(600, 152, -415), QuaternionRotation = Quaternion.Identity };
+            snowplow1.AddComponent(snowplow1Comp);
+            snowplow1.AddComponent(snowplow1Trans);
+
+            ModelComponent hangar1Comp = new ModelComponent { Model = hangarModel };
+            TransformComponent hangar1Trans = new TransformComponent { Scale = new Vector3(0.1f), Position = new Vector3(600, 150, -425), QuaternionRotation = Quaternion.Identity };
+            hangar1.AddComponent(hangar1Comp);
+            hangar1.AddComponent(hangar1Trans);
+
+            ModelComponent hangar2Comp = new ModelComponent { Model = hangarModel };
+            TransformComponent hangar2Trans = new TransformComponent { Scale = new Vector3(0.1f), Position = new Vector3(600, 150, -450), QuaternionRotation = Quaternion.Identity };
+            hangar2.AddComponent(hangar2Comp);
+            hangar2.AddComponent(hangar2Trans);
+
+            ModelComponent hangar3Comp = new ModelComponent { Model = hangarModel };
+            TransformComponent hangar3Trans = new TransformComponent { Scale = new Vector3(0.1f), Position = new Vector3(600, 150, -475), QuaternionRotation = Quaternion.Identity };
+            hangar3.AddComponent(hangar3Comp);
+            hangar3.AddComponent(hangar3Trans);
         }
 
         /// <summary>

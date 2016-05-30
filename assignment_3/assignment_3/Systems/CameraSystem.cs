@@ -17,7 +17,7 @@ namespace assignment_3.Systems
                 return;
 
             camera.ViewMatrix = Matrix.CreateLookAt(camera.CameraPosition, camera.CameraLookAt, camera.CameraUpVector);
-            camera.ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(75), camera.CameraAspectRatio, camera.CameraNearPlaneDistance, camera.CameraFarPlaneDistance);
+            camera.ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), camera.CameraAspectRatio, camera.CameraNearPlaneDistance, camera.CameraFarPlaneDistance);
         }
     }
 }

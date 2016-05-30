@@ -21,6 +21,7 @@ namespace assignment_3.Systems
                 Quaternion quatRotation = Quaternion.CreateFromYawPitchRoll(transform.Rotation.Y, transform.Rotation.X, transform.Rotation.Z);
                 transform.QuaternionRotation *= quatRotation;
                 transform.Forward = Vector3.Transform(Vector3.Forward, transform.QuaternionRotation);
+                transform.Right = Vector3.Transform(-Vector3.Right, transform.QuaternionRotation);
                 transform.WorldMatrix = Matrix.CreateScale(transform.Scale) * Matrix.CreateFromQuaternion(transform.QuaternionRotation) * Matrix.CreateTranslation(transform.Position);
             }
         }

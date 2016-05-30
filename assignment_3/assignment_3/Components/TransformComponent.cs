@@ -13,6 +13,7 @@ namespace assignment_3.Components
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
         public Vector3 Forward { get; set; }
+        public Vector3 Right { get; set; }
         public Vector3 Scale { get; set; }
         public Quaternion QuaternionRotation { get; set; }
     }

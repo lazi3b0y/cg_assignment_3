@@ -11,8 +11,14 @@ namespace assignment_3.Systems
 {
     public class ObserverSystem : UpdateSystem 
     {
+        private MouseState _previousMouseState;
+        private MouseState _currentMouseState;
+
         public override void Update(GameTime gameTime)
         {
+            _previousMouseState = _currentMouseState;
+            _currentMouseState = Mouse.GetState();
+
             var observers = ComponentHandler.GetAllComponents<ObserverComponent>();
 
             if (observers == null)
@@ -24,27 +30,19 @@ namespace assignment_3.Systems
             {
                 TransformComponent transform = ComponentHandler.GetComponent<TransformComponent>(observer.Owner);
 
-                Vector3 rotation = Vector3.Zero;
-
                 if (state.IsKeyDown(Keys.W))
-                    rotation.X += -0.02f;
-                if (state.IsKeyDown(Keys.A))
-                    rotation.Y += 0.02f;
-                if (state.IsKeyDown(Keys.S))
-                    rotation.X += 0.02f;
-                if (state.IsKeyDown(Keys.D))
-                    rotation.Y += -0.02f;
-                if (state.IsKeyDown(Keys.Up))
                     transform.Position += transform.Forward * 1f;
-                if (state.IsKeyDown(Keys.Down))
+                if (state.IsKeyDown(Keys.S))
                     transform.Position -= transform.Forward * 1f;
-                if (state.IsKeyDown(Keys.Right))
-                    rotation.Z = -0.02f;
-                if (state.IsKeyDown(Keys.Left))
-                    rotation.Z = 0.02f;
+                if (state.IsKeyDown(Keys.A))
+                    transform.Position += transform.Right * 1f;
+                if (state.IsKeyDown(Keys.D))
+                    transform.Position -= transform.Right * 1f;
 
-                transform.Rotation = rotation;
+                var mouseDelta = (_currentMouseState.Position - _previousMouseState.Position).ToVector2();
+                transform.Rotation = new Vector3(-mouseDelta.Y, -mouseDelta.X, 0) * 0.05f;
             }
-        }
+            
+         }
     }
 }

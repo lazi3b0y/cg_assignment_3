@@ -12,11 +12,11 @@ namespace assignment_3.Systems
 {
     public class ModelRenderSystem : RenderSystem
     {
-        private GraphicsDevice _graphics;
+        private TextureCube _cubeMap;
 
-        public ModelRenderSystem(GraphicsDevice graphics)
+        public ModelRenderSystem(TextureCube cubeMap)
         {
-            _graphics = graphics;
+            _cubeMap = cubeMap;
         }
 
         public override void Render(GameTime gameTime)
@@ -46,7 +46,7 @@ namespace assignment_3.Systems
                             envMap.Effect.Parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
                             envMap.Effect.Parameters["View"].SetValue(camera.ViewMatrix);
                             envMap.Effect.Parameters["Projection"].SetValue(camera.ProjectionMatrix);
-                            envMap.Effect.Parameters["ReflectiveModelTexture"].SetValue(new TextureCube(_graphics, 32, true, SurfaceFormat.Color));
+                            envMap.Effect.Parameters["ReflectiveModelTexture"].SetValue(_cubeMap);
                             envMap.Effect.Parameters["NormalMap"].SetValue(envMap.NormalMap);
                             envMap.Effect.Parameters["CameraPos"].SetValue(camera.CameraPosition);
                             envMap.Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
