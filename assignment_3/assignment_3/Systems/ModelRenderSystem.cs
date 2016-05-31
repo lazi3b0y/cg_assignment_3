@@ -1,4 +1,7 @@
 ﻿using assignment_3.Components;
+using assignment_3.EffectHelpers;
+using assignment_3.Entites;
+using assignment_3.Handlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -12,127 +15,123 @@ namespace assignment_3.Systems
 {
     public class ModelRenderSystem : RenderSystem
     {
-        private TextureCube _cubeMap;
+        private readonly CameraHandler _cameraHandler;
+        private readonly ComponentHandler _componentHandler;
+        private readonly EffectProvider _effectProvider;
+        private readonly GraphicsDevice _graphics;
+        private SortedList<float, Tuple<ModelMesh, MeshEffect, Entity>> _sortedTransparent;
 
-        public ModelRenderSystem(TextureCube cubeMap)
+        public ModelRenderSystem(GraphicsDevice graphicsDevice, EffectProvider effectProvider, ComponentHandler componentHandler, CameraHandler cameraHandler)
         {
-            _cubeMap = cubeMap;
+            _componentHandler = componentHandler;
+            _cameraHandler = cameraHandler;
+            _graphics = graphicsDevice;
+            _effectProvider = effectProvider;
+            _sortedTransparent = new SortedList<float, Tuple<ModelMesh, MeshEffect, Entity>>(new InvertedComparer());
+        }
+
+        public void DoRender(Entity exculdedEntity = null)
+        {
+            var camera = _cameraHandler.ActiveCamera;
+            var models = _componentHandler.GetAllComponents<ModelComponent>();
+            if (models == null) return;
+            _sortedTransparent.Clear();
+            foreach (var m in models)
+            {
+                if (exculdedEntity != null && m.Owner == exculdedEntity)
+                    continue;
+
+                var effect = _componentHandler.GetComponent<EffectComponent>(m.Owner);
+                var transform = _componentHandler.GetComponent<TransformComponent>(m.Owner);
+
+                if (effect == null)
+                {
+                    RenderModelWithBasicEffect(m.Model, transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
+                }
+                else
+                {
+                    foreach (var mesh in m.Model.Meshes)
+                    {
+                        if (effect.MeshEffects.ContainsKey(mesh.Name))
+                        {
+                            if (effect.MeshEffects[mesh.Name].IsTransparent)
+                            {
+                                var meshEffect = effect.MeshEffects[mesh.Name];
+                                var distanceFromCamera = Vector3.Distance(camera.CameraPosition, transform.Position);
+                                _sortedTransparent.Add(distanceFromCamera, new Tuple<ModelMesh, MeshEffect, Entity>(mesh, meshEffect, effect.Owner));
+                            }
+                            else
+                            {
+                                RenderMeshWithEffect(mesh, effect.MeshEffects[mesh.Name], effect.Owner);
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach (var transparentThings in _sortedTransparent)
+            {
+                var entity = transparentThings.Value.Item3;
+                var meshEffect = transparentThings.Value.Item2;
+                var mesh = transparentThings.Value.Item1;
+
+                RenderMeshWithEffect(mesh, meshEffect, entity, true);
+            }
+
+        }
+
+        public void RenderModelWithBasicEffect(Model model, Matrix world, Matrix view, Matrix projection)
+        {
+            _graphics.BlendState = BlendState.Opaque;
+            var boneTransforms = new Matrix[model.Bones.Count];
+            model.CopyAbsoluteBoneTransformsTo(boneTransforms);
+
+            foreach (var mesh in model.Meshes)
+            {
+                foreach (BasicEffect effect in mesh.Effects)
+                {
+                    effect.EnableDefaultLighting();
+                    effect.PreferPerPixelLighting = true;
+                    effect.World = boneTransforms[mesh.ParentBone.Index] * world;
+                    effect.View = view;
+
+                    effect.Projection = projection;
+                }
+                mesh.Draw();
+            }
+        }
+
+        public void RenderMeshWithEffect(ModelMesh mesh, MeshEffect effect, Entity e, bool transparent = false)
+        {
+            _graphics.BlendState = transparent ? BlendState.AlphaBlend : BlendState.Opaque;
+
+            var orgEffects = mesh.Effects;
+
+            foreach (var part in mesh.MeshParts)
+            {
+                part.Effect = _effectProvider.GetEffect(effect, mesh, e);
+            }
+            mesh.Draw();
+
+            mesh.Effects = orgEffects;
+
+            _graphics.BlendState = BlendState.Opaque;
         }
 
         public override void Render(GameTime gameTime)
         {
-            CameraComponent camera = CameraHandler.ActiveCamera;
-            var models = ComponentHandler.GetAllComponents<ModelComponent>();
+            DoRender();
+        }
 
-            if (camera == null || models == null)
-                return;
-
-            foreach (ModelComponent model in models)
+        internal class InvertedComparer : IComparer<float>
+        {
+            public InvertedComparer()
             {
-                TransformComponent transform = ComponentHandler.GetComponent<TransformComponent>(model.Owner);
 
-                Matrix[] transforms = new Matrix[model.Model.Bones.Count];
-                model.Model.CopyAbsoluteBoneTransformsTo(transforms);
-
-                BumpEnvironmentMappedComponent envMap = ComponentHandler.GetComponent<BumpEnvironmentMappedComponent>(model.Owner);
-                BumpMapComponent bumpMap = ComponentHandler.GetComponent<BumpMapComponent>(model.Owner);
-                EnvironmentMappingComponent envirMap = ComponentHandler.GetComponent<EnvironmentMappingComponent>(model.Owner);
-                DiffuseLightingComponent diffuseLight = ComponentHandler.GetComponent<DiffuseLightingComponent>(model.Owner);
-
-                if (envMap != null)
-                {
-                    foreach (ModelMesh mesh in model.Model.Meshes)
-                    {
-                        foreach (ModelMeshPart part in mesh.MeshParts)
-                        {
-                            envMap.Effect.Parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
-                            envMap.Effect.Parameters["View"].SetValue(camera.ViewMatrix);
-                            envMap.Effect.Parameters["Projection"].SetValue(camera.ProjectionMatrix);
-                            envMap.Effect.Parameters["ReflectiveModelTexture"].SetValue(_cubeMap);
-                            envMap.Effect.Parameters["NormalMap"].SetValue(envMap.NormalMap);
-                            envMap.Effect.Parameters["CameraPos"].SetValue(camera.CameraPosition);
-                            envMap.Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
-
-                            if (((BasicEffect)part.Effect).Texture != null)
-                            {
-                                envMap.Effect.Parameters["ModelTexture"].SetValue(((BasicEffect)part.Effect).Texture);
-                            }
-                        }
-                        model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
-                    }
-                }
-                else if (bumpMap != null)
-                {
-                    foreach (ModelMesh mesh in model.Model.Meshes)
-                    {
-                        foreach (ModelMeshPart part in mesh.MeshParts)
-                        {
-                            var parameters = bumpMap.Effect.Parameters;
-                            parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
-                            parameters["View"].SetValue(camera.ViewMatrix);
-                            parameters["Projection"].SetValue(camera.ProjectionMatrix);
-                            parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
-
-                            parameters["NormalMap"].SetValue(bumpMap.NormalMap);
-                            if (((BasicEffect)part.Effect).Texture != null)
-                            {
-                                parameters["ModelTexture"].SetValue(((BasicEffect)part.Effect).Texture);
-                            }  
-                        }
-                    }
-                    model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
-                }
-                else if (envirMap != null)
-                {
-                    foreach (ModelMesh mesh in model.Model.Meshes)
-                    {
-                        foreach (ModelMeshPart part in mesh.MeshParts)
-                        {
-                            var parameters = envirMap.Effect.Parameters;
-                            parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
-                            parameters["View"].SetValue(camera.ViewMatrix);
-                            parameters["Projection"].SetValue(camera.ProjectionMatrix);
-                            parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
-
-                            parameters["CameraPosition"].SetValue(camera.CameraPosition);
-                            parameters["ReflectionTexture"].SetValue(_cubeMap);
-                        }
-                    }
-                    model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
-                }
-                else if (diffuseLight != null)
-                {
-                    foreach (ModelMesh mesh in model.Model.Meshes)
-                    {
-                        foreach (ModelMeshPart part in mesh.MeshParts)
-                        {
-                            diffuseLight.Effect.Parameters["World"].SetValue(transform.WorldMatrix * mesh.ParentBone.Transform);
-                            diffuseLight.Effect.Parameters["View"].SetValue(camera.ViewMatrix);
-                            diffuseLight.Effect.Parameters["Projection"].SetValue(camera.ProjectionMatrix);
-                            diffuseLight.Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(transform.WorldMatrix * mesh.ParentBone.Transform)));
-                        }
-                    }
-                    model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
-                }
-                else
-                {
-                    foreach (ModelMesh mesh in model.Model.Meshes)
-                    {
-                        foreach (Effect effect in mesh.Effects)
-                        {
-                            if ((effect is BasicEffect) == false)
-                                continue;
-
-                            BasicEffect effects = (BasicEffect)effect;
-
-                            effects.EnableDefaultLighting();
-                            effects.World = transforms[mesh.ParentBone.Index] * transform.WorldMatrix;
-                            effects.View = camera.ViewMatrix;
-                            effects.Projection = camera.ProjectionMatrix;
-                        }
-                    }
-                    model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
-                }
+            }
+            public int Compare(float x, float y)
+            {
+                return y.CompareTo(x);
             }
         }
     }
