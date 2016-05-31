@@ -130,8 +130,8 @@ namespace assignment_3.Systems
                             effects.View = camera.ViewMatrix;
                             effects.Projection = camera.ProjectionMatrix;
                         }
-                        mesh.Draw();
                     }
+                    model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
                 }
             }
         }
