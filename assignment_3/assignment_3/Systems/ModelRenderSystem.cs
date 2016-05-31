@@ -80,6 +80,7 @@ namespace assignment_3.Systems
                             }  
                         }
                     }
+                    model.Model.Draw(transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix);
                 }
                 else if (envirMap != null)
                 {
