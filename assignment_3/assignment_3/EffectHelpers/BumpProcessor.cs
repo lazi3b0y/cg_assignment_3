@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace assignment_3.EffectHelpers
 {
-    public class BumpMappingEffectProcessor : EffectProcessor
+    public class BumpProcessor : EffectProcessor
     {
         private readonly ComponentHandler _componentHandler;
 
-        public BumpMappingEffectProcessor(ComponentHandler componentHandler)
+        public BumpProcessor(ComponentHandler componentHandler)
         {
             _componentHandler = componentHandler;
         }

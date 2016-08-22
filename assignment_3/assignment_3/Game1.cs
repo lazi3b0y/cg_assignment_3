@@ -10,9 +10,6 @@ using System.Collections.Generic;
 
 namespace assignment_3
 {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -28,15 +25,24 @@ namespace assignment_3
             Content.RootDirectory = "Content";
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            _effectProvider = new EffectProvider();
+
+            ModelRenderSystem mDR = new ModelRenderSystem(_graphics.GraphicsDevice, _effectProvider, _componentHandler, _cameraHandler);
+            _systemHandler.AddSystem(new ObserverSystem());
+            _systemHandler.AddSystem(new ChaseCameraSystem());
+            _systemHandler.AddSystem(new CameraSystem());
+            _systemHandler.AddSystem(new TransformSystem());
+            _systemHandler.AddSystem(new CubeMapSystem(_graphics.GraphicsDevice, _cameraHandler, mDR, _componentHandler));
+            _systemHandler.AddSystem(mDR);
+
             _settings = new Settings
             {
                 AmbientColor = Color.White,
@@ -49,33 +55,15 @@ namespace assignment_3
                 FogColor = Color.Black
             };
 
-            _effectProvider = new EffectProvider();
-
-            base.Initialize();
-        }
-
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
-        protected override void LoadContent()
-        {
-            ModelRenderSystem mDR = new ModelRenderSystem(_graphics.GraphicsDevice, _effectProvider, _componentHandler, _cameraHandler);
-            _systemHandler.AddSystem(new ObserverSystem());
-            _systemHandler.AddSystem(new ChaseCameraSystem());
-            _systemHandler.AddSystem(new CameraSystem());
-            _systemHandler.AddSystem(new TransformSystem());
-            _systemHandler.AddSystem(new EnvironmentSystem(_graphics.GraphicsDevice, _cameraHandler, mDR, _componentHandler));
-            _systemHandler.AddSystem(mDR);
-
-            _effectProvider.AddEffectProcessor("Matrices", new MatrixEffectProcessor(_cameraHandler, _componentHandler));
-            _effectProvider.AddEffectProcessor("Reflection", new ReflectionEffectProcessor(_componentHandler, _cameraHandler));
+            _effectProvider.AddEffectProcessor("TextureMapping", new TextureProcessor(_componentHandler));
+            _effectProvider.AddEffectProcessor("AmbientLight", new AmbientProcessor(_settings));
+            _effectProvider.AddEffectProcessor("Specular", new SpecularProcessor(_componentHandler));
+            _effectProvider.AddEffectProcessor("BumpMapping", new BumpProcessor(_componentHandler));
+            _effectProvider.AddEffectProcessor("Matrices", new MatrixProcessor(_cameraHandler, _componentHandler));
+            _effectProvider.AddEffectProcessor("Reflection", new ReflectionProcessor(_componentHandler, _cameraHandler));
             _effectProvider.AddEffectProcessor("Transparency", new TransparencyProcessor(_componentHandler));
-            _effectProvider.AddEffectProcessor("DirectionLight", new DirectionLightEffectProcessor(_settings));
-            _effectProvider.AddEffectProcessor("AmbientLight", new AmbientLightEffectProcessor(_settings));
-            _effectProvider.AddEffectProcessor("Specular", new SpecularLightEffectProcessor(_componentHandler));
-            _effectProvider.AddEffectProcessor("BumpMapping", new BumpMappingEffectProcessor(_componentHandler));
-            _effectProvider.AddEffectProcessor("Fog", new FogEffectProcessor(_settings, _cameraHandler));
+            _effectProvider.AddEffectProcessor("DirectionLight", new DirectionProcessor(_settings));
+            _effectProvider.AddEffectProcessor("Fog", new FogProcessor(_settings, _cameraHandler));
 
             CameraComponent camera = new CameraComponent { CameraNearPlaneDistance = 0.1f, CameraFarPlaneDistance = 500f, CameraAspectRatio = _graphics.GraphicsDevice.Viewport.AspectRatio };
             ChaseCameraComponent chaseCamera = new ChaseCameraComponent { CameraOffset = new Vector3(0, 0.1f, 1) };
@@ -95,7 +83,7 @@ namespace assignment_3
 
             //Load 3d texturized model files
             Model hangarModel = Content.Load<Model>("moffett-hangar2");
-            Model snowplowModel = Content.Load<Model>("PlayerSphere");
+            Model snowplowModel = Content.Load<Model>("snowplow");
             var effect = Content.Load<Effect>("BumpRefMapShader");
 
             ModelComponent snowplow1Comp = new ModelComponent { Model = snowplowModel };
@@ -110,15 +98,15 @@ namespace assignment_3
 
             EffectComponent hangar1EffectComponent = new EffectComponent();
             hangar1EffectComponent.MeshEffects = new Dictionary<string, MeshEffect>();
-            hangar1EffectComponent.MeshEffects.Add("pSphere1", new MeshEffect
+            hangar1EffectComponent.MeshEffects.Add("object.002", new MeshEffect
             {
                 IsTransparent = true,
-                IsReflective = false,
                 Effect = effect.Clone(),
                 Parameters = new List<string>
                 {
                     "Matrices",
                     "AmbientLight",
+                    "TextureMapping",
                     "Transparency"
                 },
                 Settings = new Dictionary<string, object>
@@ -126,27 +114,36 @@ namespace assignment_3
                     ["TransparencyAmount"] = .7f,
                     ["ReflectionAmount"] = 1f,
                     ["EnviromentMap"] = null,
+                    ["Modeltexture"] = Content.Load<Texture2D>("moffett-hangar2-roof")
                 }
             });
 
+            //hangar1EffectComponent.MeshEffects.Add("box.002", new MeshEffect
+            //{
+            //    IsTransparent = false,
+            //    Effect = effect.Clone(),
+            //    Parameters = new List<string>
+            //    {
+            //        "Matrices",
+            //        "AmbientLight",
+            //        "Transparency"
+            //    },
+            //    Settings = new Dictionary<string, object>
+            //    {
+            //        ["TransparencyAmount"] = .7f,
+            //        ["ReflectionAmount"] = 1f,
+            //        ["EnviromentMap"] = null,
+            //    }
+            //});
 
-            snowplow1.AddComponent(hangar1EffectComponent);
+            hangar1.AddComponent(hangar1EffectComponent);
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
+
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -156,10 +153,6 @@ namespace assignment_3
             base.Update(gameTime);
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);

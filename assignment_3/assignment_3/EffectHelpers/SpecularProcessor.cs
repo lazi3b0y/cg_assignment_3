@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace assignment_3.EffectHelpers
 {
-    public class SpecularLightEffectProcessor : EffectProcessor
+    public class SpecularProcessor : EffectProcessor
     {
         private readonly ComponentHandler _componentHandler;
 
-        public SpecularLightEffectProcessor(ComponentHandler componentHandler)
+        public SpecularProcessor(ComponentHandler componentHandler)
         {
             _componentHandler = componentHandler;
         }

@@ -8,11 +8,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace assignment_3.EffectHelpers
 {
-    public class AmbientLightEffectProcessor : EffectProcessor
+    public class AmbientProcessor : EffectProcessor
     {
         private readonly Settings _settings;
 
-        public AmbientLightEffectProcessor(Settings settings)
+        public AmbientProcessor(Settings settings)
         {
             _settings = settings;
         }

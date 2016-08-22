@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace assignment_3.EffectHelpers
 {
-    public class FogEffectProcessor : EffectProcessor
+    public class FogProcessor : EffectProcessor
     {
         private readonly Settings _settings;
         private readonly CameraHandler _cameraHandler;
 
-        public FogEffectProcessor(Settings settings, CameraHandler cameraHandler)
+        public FogProcessor(Settings settings, CameraHandler cameraHandler)
         {
             _settings = settings;
             _cameraHandler = cameraHandler;

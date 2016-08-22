@@ -10,20 +10,15 @@ using System.Threading.Tasks;
 
 namespace assignment_3.Systems
 {
-    public class EnvironmentSystem : UpdateSystem
+    public class CubeMapSystem : UpdateSystem
     {
         private readonly ComponentHandler _componentHandler;
         private readonly CameraHandler _cameraManager;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly ModelRenderSystem _modelRenderSystem;
-
         private readonly RenderTargetCube _refCube;
 
-        public event EventHandler<EventArgs> EnabledChanged;
-        public event EventHandler<EventArgs> UpdateOrderChanged;
-
-
-        public EnvironmentSystem(GraphicsDevice graphicsDevice, CameraHandler cameraHandler,
+        public CubeMapSystem(GraphicsDevice graphicsDevice, CameraHandler cameraHandler,
             ModelRenderSystem modelRenderSystem, ComponentHandler componentHandler)
         {
             _graphicsDevice = graphicsDevice;

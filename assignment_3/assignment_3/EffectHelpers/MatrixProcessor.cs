@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace assignment_3.EffectHelpers
 {
-    public class MatrixEffectProcessor : EffectProcessor
+    public class MatrixProcessor : EffectProcessor
     {
         private readonly CameraHandler _cameraHandler;
         private readonly ComponentHandler _componentHandler;
 
-        public MatrixEffectProcessor(CameraHandler cameraHandler, ComponentHandler componentHandler)
+        public MatrixProcessor(CameraHandler cameraHandler, ComponentHandler componentHandler)
         {
             _cameraHandler = cameraHandler;
             _componentHandler = componentHandler;

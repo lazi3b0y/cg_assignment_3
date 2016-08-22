@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace assignment_3.EffectHelpers
 {
-    public class ReflectionEffectProcessor : EffectProcessor
+    public class ReflectionProcessor : EffectProcessor
     {
         private readonly ComponentHandler _componentHandler;
         private readonly CameraHandler _cameraHandler;
 
-        public ReflectionEffectProcessor(ComponentHandler componentHandler, CameraHandler cameraHandler)
+        public ReflectionProcessor(ComponentHandler componentHandler, CameraHandler cameraHandler)
         {
             _componentHandler = componentHandler;
             _cameraHandler = cameraHandler;

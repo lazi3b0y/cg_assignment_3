@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace assignment_3.EffectHelpers
 {
-    public class DirectionLightEffectProcessor : EffectProcessor
+    public class DirectionProcessor : EffectProcessor
     {
         private readonly Settings _settings;
 
-        public DirectionLightEffectProcessor(Settings settings)
+        public DirectionProcessor(Settings settings)
         {
             _settings = settings;
         }
