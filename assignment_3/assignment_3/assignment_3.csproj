@@ -46,13 +46,12 @@
     <Compile Include="Components\ObserverComponent.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="EffectHelpers\AmbientProcessor.cs" />
-    <Compile Include="EffectHelpers\BumpProcessor.cs" />
     <Compile Include="EffectHelpers\DirectionProcessor.cs" />
     <Compile Include="EffectHelpers\EffectProcessor.cs" />
     <Compile Include="EffectHelpers\EffectProvider.cs" />
     <Compile Include="EffectHelpers\FogProcessor.cs" />
     <Compile Include="EffectHelpers\MatrixProcessor.cs" />
-    <Compile Include="EffectHelpers\ReflectionProcessor.cs" />
+    <Compile Include="EffectHelpers\ShadowProcessor.cs" />
     <Compile Include="EffectHelpers\Settings.cs" />
     <Compile Include="EffectHelpers\SpecularProcessor.cs" />
     <Compile Include="EffectHelpers\TextureProcessor.cs" />

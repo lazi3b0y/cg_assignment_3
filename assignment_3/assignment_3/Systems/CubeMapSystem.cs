@@ -36,7 +36,7 @@ namespace assignment_3.Systems
             {
                 foreach (var e in effect.MeshEffects)
                 {
-                    if (e.Value.IsReflective)
+                    if (e.Value.IsShadow)
                     {
                         var settings = e.Value.Settings;
 
@@ -101,7 +101,6 @@ namespace assignment_3.Systems
                         camera.ProjectionMatrix = orgProjection;
                     }
                 }
-
             }
         }
 

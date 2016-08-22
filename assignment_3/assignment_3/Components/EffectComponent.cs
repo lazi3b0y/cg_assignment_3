@@ -11,7 +11,7 @@ namespace assignment_3.Components
     {
         public Effect Effect { get; set; }
         public bool IsTransparent { get; set; }
-        public bool IsReflective { get; set; }
+        public bool IsShadow { get; set; }
         public ICollection<string> Parameters { get; set; }
         public IDictionary<string, object> Settings { get; set; }
     }

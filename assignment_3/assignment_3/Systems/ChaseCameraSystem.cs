@@ -27,7 +27,7 @@ namespace assignment_3.Systems
                 Vector3 cameraPosition = Vector3.Transform(cameraOffset, quaternionRotationMatrix);
 
                 cameraPosition += transform.Position;
-                baseCamera.CameraUpVector = Vector3.Transform(Vector3.Up, quaternionRotationMatrix);
+                baseCamera.CameraUpVector = Vector3.Up;
                 baseCamera.CameraPosition = cameraPosition;
                 baseCamera.CameraLookAt = transform.Position;
             }

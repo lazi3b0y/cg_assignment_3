@@ -1,6 +1,7 @@
 ﻿using assignment_3.Components;
 using assignment_3.Entites;
 using assignment_3.Handlers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,15 @@ using System.Threading.Tasks;
 
 namespace assignment_3.EffectHelpers
 {
-    public class BumpProcessor : EffectProcessor
+    public class ShadowProcessor : EffectProcessor
     {
         private readonly ComponentHandler _componentHandler;
+        private readonly CameraHandler _cameraHandler;
 
-        public BumpProcessor(ComponentHandler componentHandler)
+        public ShadowProcessor(ComponentHandler componentHandler, CameraHandler cameraHandler)
         {
             _componentHandler = componentHandler;
+            _cameraHandler = cameraHandler;
         }
 
         public override void Process(Entity entity, ref Effect effect, ModelMesh mesh)
@@ -24,12 +27,12 @@ namespace assignment_3.EffectHelpers
             var ef = _componentHandler.GetComponent<EffectComponent>(entity);
             var settings = ef.MeshEffects[mesh.Name].Settings;
 
-            effect.Parameters["bumpMappingEnabled"].SetValue(true);
-            if (settings.ContainsKey("BumpConstant"))
-                effect.Parameters["BumpConstant"].SetValue((float)settings["BumpConstant"]);
+            effect.Parameters["ShadowEnabled"].SetValue(true);
 
-            if (settings.ContainsKey("NormalMap"))
-                effect.Parameters["NormalMap"].SetValue((Texture2D)settings["NormalMap"]);
+            if (settings.ContainsKey("ShadowIntensity"))
+                effect.Parameters["ShadowIntensity"].SetValue((float)settings["ShadowIntensity"]);
+
+            //effect.Parameters["ShadowMapTexture"].SetValue();
         }
     }
 }

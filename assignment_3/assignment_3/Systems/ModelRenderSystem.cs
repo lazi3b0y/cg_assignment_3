@@ -63,6 +63,7 @@ namespace assignment_3.Systems
                             else
                             {
                                 RenderMeshWithEffect(mesh, effect.MeshEffects[mesh.Name], effect.Owner);
+                                RenderRemainingModelWithBasicEffect(m.Model, transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix, mesh);
                             }
                         }
                     }
@@ -75,9 +76,37 @@ namespace assignment_3.Systems
                 var meshEffect = transparentThings.Value.Item2;
                 var mesh = transparentThings.Value.Item1;
 
+                var model = _componentHandler.GetComponent<ModelComponent>(entity);
+                var transform = _componentHandler.GetComponent<TransformComponent>(entity);
+                
                 RenderMeshWithEffect(mesh, meshEffect, entity, true);
+                RenderRemainingModelWithBasicEffect(model.Model, transform.WorldMatrix, camera.ViewMatrix, camera.ProjectionMatrix, mesh);
             }
 
+        }
+
+        private void RenderRemainingModelWithBasicEffect(Model model, Matrix world, Matrix view, Matrix projection, ModelMesh modelmesh)
+        {
+            _graphics.BlendState = BlendState.Opaque;
+            var boneTransforms = new Matrix[model.Bones.Count];
+            model.CopyAbsoluteBoneTransformsTo(boneTransforms);
+
+            foreach (var mesh in model.Meshes)
+            {
+                if(mesh != modelmesh)
+                {
+                    foreach (BasicEffect effect in mesh.Effects)
+                    {
+                        effect.EnableDefaultLighting();
+                        effect.PreferPerPixelLighting = true;
+                        effect.World = boneTransforms[mesh.ParentBone.Index] * world;
+                        effect.View = view;
+
+                        effect.Projection = projection;
+                    }
+                    mesh.Draw();
+                }
+            }
         }
 
         public void RenderModelWithBasicEffect(Model model, Matrix world, Matrix view, Matrix projection)
@@ -104,12 +133,14 @@ namespace assignment_3.Systems
         public void RenderMeshWithEffect(ModelMesh mesh, MeshEffect effect, Entity e, bool transparent = false)
         {
             _graphics.BlendState = transparent ? BlendState.AlphaBlend : BlendState.Opaque;
-
+            var transform = _componentHandler.GetComponent<TransformComponent>(e);
             var orgEffects = mesh.Effects;
-
+            
             foreach (var part in mesh.MeshParts)
             {
                 part.Effect = _effectProvider.GetEffect(effect, mesh, e);
+                if(transparent)
+                    part.Effect.Parameters["World"].SetValue(Matrix.CreateWorld(transform.Position + new Vector3(0,34,0), transform.Forward, new Vector3(0,1,0)));
             }
             mesh.Draw();
 
