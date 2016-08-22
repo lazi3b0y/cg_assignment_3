@@ -25,6 +25,7 @@ namespace assignment_3.EffectHelpers
         public override void Process(Entity entity, ref Effect effect, ModelMesh mesh)
         {
             var ef = _componentHandler.GetComponent<EffectComponent>(entity);
+            var tr = _componentHandler.GetComponent<TransformComponent>(entity);
             var settings = ef.MeshEffects[mesh.Name].Settings;
 
             effect.Parameters["ShadowEnabled"].SetValue(true);
@@ -32,7 +33,14 @@ namespace assignment_3.EffectHelpers
             if (settings.ContainsKey("ShadowIntensity"))
                 effect.Parameters["ShadowIntensity"].SetValue((float)settings["ShadowIntensity"]);
 
-            //effect.Parameters["ShadowMapTexture"].SetValue();
+            var lightPos = new Vector3(1, 1, 0);
+
+            var lightsView = Matrix.CreateLookAt(lightPos, new Vector3(1, 1, 0), new Vector3(0, 1, 0));
+            var lightsProjection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver2, 1f, 5f, 100f);
+
+            var lightsViewProjectionMatrix = lightsView * lightsProjection;
+
+            effect.Parameters["LightsWorldViewProjection"].SetValue(Matrix.Identity * lightsViewProjectionMatrix);
         }
     }
 }

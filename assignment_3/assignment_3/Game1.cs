@@ -56,6 +56,7 @@ namespace assignment_3
             };
 
             _effectProvider.AddEffectProcessor("TextureMapping", new TextureProcessor(_componentHandler));
+            _effectProvider.AddEffectProcessor("SpecularLight", new SpecularProcessor(_componentHandler));
             _effectProvider.AddEffectProcessor("AmbientLight", new AmbientProcessor(_settings));
             _effectProvider.AddEffectProcessor("Matrices", new MatrixProcessor(_cameraHandler, _componentHandler));
             _effectProvider.AddEffectProcessor("Shadow", new ShadowProcessor(_componentHandler, _cameraHandler));
@@ -109,7 +110,8 @@ namespace assignment_3
                     "Matrices",
                     "AmbientLight",
                     "DirectionLight",
-                    "Fog"
+                    "Fog",
+                    "SpecularLight"
                 },
                 Settings = new Dictionary<string, object>
                 {
@@ -138,19 +140,19 @@ namespace assignment_3
                     "Matrices",
                     "AmbientLight",
                     "DirectionLight",
-                    "Fog",
+                    "SpecularLight",
                     "Shadow"
                 },
                 Settings = new Dictionary<string, object>
                 {
-
+                    {"ShadowIntensity", 0.5f}
                 }
             });
             sphere2.AddComponent(sphere2Effect);
 
             //Sphere 3 - Shadow
             Entity sphere3 = new Entity();
-            Model sphereModel3 = Content.Load<Model>("sphere_mapped2");
+            Model sphereModel3 = Content.Load<Model>("sphere_mapped3");
             ModelComponent sphere3ModelComp = new ModelComponent { Model = sphereModel3 };
             TransformComponent sphere3TransComp = new TransformComponent { Scale = new Vector3(12f), Position = new Vector3(575, 150, -330), QuaternionRotation = Quaternion.Identity };
             sphere3.AddComponent(sphere3ModelComp);
@@ -158,7 +160,7 @@ namespace assignment_3
 
             EffectComponent sphere3Effect = new EffectComponent();
             sphere3Effect.MeshEffects = new Dictionary<string, MeshEffect>();
-            sphere3Effect.MeshEffects.Add("Sphere2", new MeshEffect
+            sphere3Effect.MeshEffects.Add("Sphere", new MeshEffect
             {
                 IsTransparent = false,
                 IsShadow = false,
@@ -168,19 +170,19 @@ namespace assignment_3
                     "Matrices",
                     "AmbientLight",
                     "DirectionLight",
-                    "Fog",
+                    "SpecularLight",
                     "Shadow"
                 },
                 Settings = new Dictionary<string, object>
                 {
-
+                    {"ShadowIntensity", 0.5f}
                 }
             });
             sphere3.AddComponent(sphere3Effect);
 
-            //Sphere 4 - Shadow
+            //Sphere 4 - Non fog
             Entity sphere4 = new Entity();
-            Model sphereModel4 = Content.Load<Model>("sphere_mapped2");
+            Model sphereModel4 = Content.Load<Model>("sphere_mapped4");
             ModelComponent sphere4ModelComp = new ModelComponent { Model = sphereModel4 };
             TransformComponent sphere4TransComp = new TransformComponent { Scale = new Vector3(12f), Position = new Vector3(500, 150, -330), QuaternionRotation = Quaternion.Identity };
             sphere4.AddComponent(sphere4ModelComp);
@@ -188,7 +190,7 @@ namespace assignment_3
 
             EffectComponent sphere4Effect = new EffectComponent();
             sphere4Effect.MeshEffects = new Dictionary<string, MeshEffect>();
-            sphere4Effect.MeshEffects.Add("Sphere2", new MeshEffect
+            sphere4Effect.MeshEffects.Add("Sphere", new MeshEffect
             {
                 IsTransparent = false,
                 IsShadow = true,
@@ -198,12 +200,11 @@ namespace assignment_3
                     "Matrices",
                     "AmbientLight",
                     "DirectionLight",
-                    "Fog",
-                    "Shadow"
+                    "SpecularLight",
                 },
                 Settings = new Dictionary<string, object>
                 {
-
+                    {"ShadowIntensity", 0.5f}
                 }
             });
             sphere4.AddComponent(sphere4Effect);
@@ -234,6 +235,7 @@ namespace assignment_3
                 }
             });
             hangar1.AddComponent(hangar1Effect);
+            
         }
 
         protected override void UnloadContent()

@@ -13,24 +13,25 @@ float4x4 View;
 float4x4 Projection;
 float4x4 WorldInverseTranspose;
 float3 CameraPosition;
+float4x4 LightsWorldViewProjection;
 
-// Ambient Light
+//Ambient Light
 bool ambientEnabled = false;
 float4 AmbientColor = float4(1, 1, 1, 1);
 float AmbientIntensity = 0.1;
 
-// Direction light
+//Direction light
 bool directionLightEnabled = false;
 float3 DiffuseLightDirection = float3(1, 1, 0);
 float4 DiffuseColor = float4(0, 1, 0, 1);
 float DiffuseIntensity = 0.1;
 
-// Speculare (shininess)
+//Speculare (shininess)
 bool specularEnabled = false;
 float Shininess = 400;
 float4 SpecularColor = float4(1, 1, 1, 1);
 float SpecularIntensity = .6;
-float3 SpecularDirection = float3(1,1,0);
+float3 SpecularDirection = float3(1, 1, 0);
 
 //Transparency
 bool TransparencyEnabled =false;
@@ -43,10 +44,10 @@ float FogStart;
 float FogEnd;
 float4 FogColor = float4(1, 0, 0, 1);
 
-// Shadow
+//Shadow
 bool ShadowEnabled = false;
-float ShadowIntensity = 0.5;
-texture ShadowMapTexture;
+float ShadowIntensity = 1;
+uniform sampler2D shadowMap;
 
 struct VertexShaderInput
 {
@@ -76,7 +77,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 	output.ViewVector = normalize(viewVector);
 	output.Position = mul(viewPosition, Projection);
-	output.Position2D = output.Position;
+	output.Position2D = mul(input.Position, LightsWorldViewProjection);
 	output.TextureCoordinate = input.TextureCoordinate;
 	output.Normal = normalize(mul(input.Normal, WorldInverseTranspose));
 
@@ -122,19 +123,19 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	if(TransparencyEnabled){
 		clip(Transparency < TransparencyThreshold ? 0:1);
 	}else{
-		Transparency =1;
+		Transparency = 1;
 	}
 	
 	returnColor.a = Transparency;
 	
+	if (ShadowEnabled) {
+		returnColor *= 1 - (input.Position2D.z / input.Position2D.w);
+	}
+
 	if (FogEnabled) {
 		return lerp(returnColor, FogColor, input.Fog);
 	}
 
-	if(ShadowEnabled){
-		returnColor *= input.Position2D.z/input.Position2D.w;
-	}
-	
 	return saturate(returnColor); 
 }
 
